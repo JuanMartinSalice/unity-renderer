@@ -5,7 +5,7 @@ namespace AvatarNamesHUD
 {
     public class AvatarNamesHUDController : IHUD
     {
-        private const int DEFAULT_MAX_AVATARS = 200;
+        private const int DEFAULT_MAX_AVATARS = 50;
 
         private BaseDictionary<string, Player> otherPlayers => DataStore.i.player.otherPlayers;
 
