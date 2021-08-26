@@ -11,7 +11,7 @@ public class TestUI : MonoBehaviour
     public Button faceVisibleButton;
     public Text faceVisibleText;
 
-    private bool faceEnabled;
+    private bool faceEnabled = true;
 
     void Awake()
     {

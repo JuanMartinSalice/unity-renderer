@@ -41,6 +41,32 @@ namespace AvatarNamesHUD
             if ( current != previous )
             {
                 view.Initialize(current);
+
+                reservePlayers.Clear();
+
+                {
+                    using var enumerator = otherPlayers.Get().GetEnumerator();
+
+                    while (enumerator.MoveNext())
+                    {
+                        string userId = enumerator.Current.Key;
+
+                        if (trackingPlayers.Contains(userId))
+                        {
+                            trackingPlayers.Remove(enumerator.Current.Key);
+                            view?.UntrackPlayer(enumerator.Current.Key);
+                        }
+                    }
+                }
+
+                {
+                    using var enumerator = otherPlayers.Get().GetEnumerator();
+
+                    while (enumerator.MoveNext())
+                    {
+                        OnOtherPlayersStatusAdded(enumerator.Current.Key, enumerator.Current.Value);
+                    }
+                }
             }
         }
 
