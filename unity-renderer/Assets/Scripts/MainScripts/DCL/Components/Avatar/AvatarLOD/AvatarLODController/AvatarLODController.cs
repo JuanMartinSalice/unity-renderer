@@ -12,6 +12,7 @@ namespace DCL
         void SetSimpleAvatar();
         void SetImpostor();
         void SetInvisible();
+        void SetFaceVisible(bool setFace);
     }
 
     public class AvatarLODController : IAvatarLODController
@@ -33,6 +34,7 @@ namespace DCL
 
         internal bool SSAOEnabled;
         internal bool facialFeaturesEnabled;
+        internal bool forceFacialFeaturesValue = true;
 
         internal Coroutine currentTransition = null;
         internal State? lastRequestedState = null;
@@ -59,7 +61,7 @@ namespace DCL
             if (player?.renderer == null)
                 return;
 
-            SetAvatarFeatures(true, true);
+            SetAvatarFeatures(true, forceFacialFeaturesValue);
             StartTransition(1, 0);
         }
 
@@ -87,6 +89,12 @@ namespace DCL
 
             SetAvatarFeatures(false, false);
             StartTransition(0, 1);
+        }
+
+        public void SetFaceVisible(bool isVisible)
+        {
+            forceFacialFeaturesValue = isVisible;
+            player.renderer.SetFacialFeaturesVisible(isVisible && facialFeaturesEnabled);
         }
 
         public void SetInvisible()

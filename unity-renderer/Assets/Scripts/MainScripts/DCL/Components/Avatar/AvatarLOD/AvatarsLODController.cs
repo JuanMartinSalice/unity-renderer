@@ -14,6 +14,7 @@ namespace DCL
         private BaseVariable<float> LODDistance => DataStore.i.avatarsLOD.LODDistance;
         private BaseVariable<int> maxAvatars => DataStore.i.avatarsLOD.maxAvatars;
         private BaseVariable<int> maxImpostors => DataStore.i.avatarsLOD.maxImpostors;
+        private BaseVariable<bool> facesEnabled => DataStore.i.avatarsLOD.facesEnabled;
         private Vector3 cameraPosition;
         private Vector3 cameraForward;
 
@@ -23,7 +24,7 @@ namespace DCL
         public AvatarsLODController()
         {
             KernelConfig.i.EnsureConfigInitialized()
-                        .Then(Initialize);
+                .Then(Initialize);
         }
 
         internal void Initialize(KernelConfigModel config)
@@ -36,8 +37,22 @@ namespace DCL
             {
                 RegisterAvatar(keyValuePair.Key, keyValuePair.Value);
             }
+
             otherPlayers.OnAdded += RegisterAvatar;
             otherPlayers.OnRemoved += UnregisterAvatar;
+
+            facesEnabled.OnChange += OnFacesEnabledChange;
+        }
+
+        private void OnFacesEnabledChange(bool current, bool previous)
+        {
+            if ( current != previous )
+            {
+                foreach (var kvp in lodControllers)
+                {
+                    kvp.Value.SetFaceVisible(current);
+                }
+            }
         }
 
         public void RegisterAvatar(string id, Player player)
@@ -131,6 +146,7 @@ namespace DCL
                     avatarsCount++;
                     continue;
                 }
+
                 if (impostorCount < maxImpostors)
                 {
                     lodController.SetImpostor();
@@ -163,6 +179,10 @@ namespace DCL
         }
 
         private bool IsInFrontOfCamera(Vector3 position) { return Vector3.Dot(cameraForward, (position - cameraPosition).normalized) >= RENDERED_DOT_PRODUCT_ANGLE; }
+
+        public void DisableAllFaces()
+        {
+        }
 
         public void Dispose()
         {

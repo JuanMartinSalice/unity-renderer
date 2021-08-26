@@ -15,15 +15,17 @@ namespace AvatarNamesHUD
 
         internal virtual IAvatarNamesHUDView CreateView() { return AvatarNamesHUDView.CreateView(); }
 
-        private int maxAvatarNames;
+        private int maxAvatarNames => DataStore.i.avatarsLOD.maxNames.Get();
 
         public AvatarNamesHUDController() : this(DEFAULT_MAX_AVATARS) { }
-        public AvatarNamesHUDController(int maxAvatarNames) { this.maxAvatarNames = maxAvatarNames; }
+        public AvatarNamesHUDController(int maxAvatarNames) { DataStore.i.avatarsLOD.maxNames.Set( maxAvatarNames ); }
 
         public void Initialize()
         {
             view = CreateView();
             view?.Initialize(maxAvatarNames);
+
+            DataStore.i.avatarsLOD.maxNames.OnChange += OnNameCountChange;
 
             otherPlayers.OnAdded += OnOtherPlayersStatusAdded;
             otherPlayers.OnRemoved += OnOtherPlayersStatusRemoved;
@@ -31,6 +33,14 @@ namespace AvatarNamesHUD
             while (enumerator.MoveNext())
             {
                 OnOtherPlayersStatusAdded(enumerator.Current.Key, enumerator.Current.Value);
+            }
+        }
+
+        private void OnNameCountChange(int current, int previous)
+        {
+            if ( current != previous )
+            {
+                view.Initialize(current);
             }
         }
 

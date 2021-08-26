@@ -77,6 +77,9 @@ namespace DCL
             public const int DEFAULT_MAX_AVATAR = 50;
             public const int DEFAULT_MAX_IMPOSTORS = 70;
 
+            public readonly BaseVariable<int> maxNames = new BaseVariable<int>(200);
+            public readonly BaseVariable<bool> facesEnabled = new BaseVariable<bool>(true);
+
             public readonly BaseVariable<float> simpleAvatarDistance = new BaseVariable<float>(15f);
             public readonly BaseVariable<float> LODDistance = new BaseVariable<float>(16f);
             public readonly BaseVariable<int> maxAvatars = new BaseVariable<int>(DEFAULT_MAX_AVATAR);
@@ -104,12 +107,12 @@ namespace DCL
         {
             [System.NonSerialized]
             public string wssServerUrl = "ws://localhost:5000/";
-            
+
             [System.NonSerialized]
             public string wssServiceId = "dcl";
-            
+
             public readonly BaseVariable<bool> communicationEstablished = new BaseVariable<bool>();
             public readonly BaseVariable<bool> communicationReady = new BaseVariable<bool>();
-        }        
+        }
     }
 }
