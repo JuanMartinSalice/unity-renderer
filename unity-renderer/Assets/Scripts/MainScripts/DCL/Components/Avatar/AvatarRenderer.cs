@@ -681,14 +681,6 @@ namespace DCL
                 avatarMeshCombiner.container.transform.localPosition = Vector3.zero;
             }
 
-            var renderersToHide = allRenderers.Where((r) => r.transform.parent.gameObject.name.Contains("Mask")).ToList();
-
-            foreach ( var r in renderersToHide )
-            {
-                r.forceRenderingOff = true;
-                r.gameObject.SetActive(false);
-            }
-
             return success;
         }
 
