@@ -157,7 +157,7 @@ namespace DCL
             StopLoadingCoroutines();
             if (!isDestroyed)
             {
-                SetVisibility(true);
+                SetGOVisibility(true);
                 if (lodRenderer != null)
                     SetImpostorVisibility(false);
             }
@@ -593,12 +593,20 @@ namespace DCL
             this.eyesController = original.eyesController;
         }
 
-        public void SetVisibility(bool newVisibility)
+        public void SetGOVisibility(bool newVisibility)
         {
             //NOTE(Brian): Avatar being loaded needs the renderer.enabled as false until the loading finishes.
             //             So we can' manipulate the values because it'd show an incomplete avatar. Its easier to just deactivate the gameObject.
             if (gameObject.activeSelf != newVisibility)
                 gameObject.SetActive(newVisibility);
+        }
+
+        public void SetRendererEnabled(bool newVisibility)
+        {
+            if (avatarMeshCombiner.renderer == null)
+                return;
+
+            avatarMeshCombiner.renderer.enabled = newVisibility;
         }
 
         public void SetImpostorVisibility(bool impostorVisibility) { lodRenderer.gameObject.SetActive(impostorVisibility); }
