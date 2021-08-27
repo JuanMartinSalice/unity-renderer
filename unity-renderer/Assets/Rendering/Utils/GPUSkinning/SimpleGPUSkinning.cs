@@ -35,6 +35,7 @@ public class SimpleGPUSkinning
             material.SetMatrixArray(BIND_POSES, skr.sharedMesh.bindposes.ToArray());
             material.EnableKeyword("_GPU_SKINNING");
         }
+
         bones = skr.bones;
         meshFilter.mesh.bounds = new Bounds(new Vector3(0, 2, 0), new Vector3(1, 3, 1));
 
@@ -79,6 +80,9 @@ public class SimpleGPUSkinning
 
     public void Update()
     {
+        if ( !renderer.isVisible )
+            return;
+
         int bonesLength = bones.Length;
 
         for (int i = 0; i < bonesLength; i++)
@@ -86,6 +90,7 @@ public class SimpleGPUSkinning
             Transform bone = bones[i];
             boneMatrices[i] = bone.localToWorldMatrix;
         }
+
         foreach (Material material in renderer.sharedMaterials)
         {
             material.SetMatrix(RENDERER_WORLD_INVERSE, renderer.transform.worldToLocalMatrix);
