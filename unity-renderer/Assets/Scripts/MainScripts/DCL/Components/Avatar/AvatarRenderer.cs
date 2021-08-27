@@ -603,10 +603,10 @@ namespace DCL
 
         public void SetRendererEnabled(bool newVisibility)
         {
-            if (avatarMeshCombiner.renderer == null)
+            if (mainMeshRenderer == null)
                 return;
 
-            avatarMeshCombiner.renderer.enabled = newVisibility;
+            mainMeshRenderer.enabled = newVisibility;
         }
 
         public void SetImpostorVisibility(bool impostorVisibility) { lodRenderer.gameObject.SetActive(impostorVisibility); }
@@ -688,7 +688,7 @@ namespace DCL
 
         private void LateUpdate()
         {
-            if (gpuSkinning != null)
+            if (gpuSkinning != null && mainMeshRenderer.enabled)
                 gpuSkinning.Update();
         }
 
