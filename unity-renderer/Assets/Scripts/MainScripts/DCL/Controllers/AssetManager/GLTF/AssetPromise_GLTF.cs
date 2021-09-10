@@ -1,5 +1,6 @@
 using System;
 using DCL.Helpers;
+using DCL.Models;
 using UnityGLTF;
 
 namespace DCL
@@ -22,13 +23,19 @@ namespace DCL
         private bool waitingAssetLoad = false;
 
         public AssetPromise_GLTF(string url, IWebRequestController webRequestController)
-            : this(new ContentProvider_Dummy(), url, null, webRequestController) { }
+            : this(new ContentProvider_Dummy(), url, null, webRequestController)
+        {
+        }
 
         public AssetPromise_GLTF(ContentProvider provider, string url, string hash = null)
-            : this(provider, url, hash, Environment.i.platform.webRequest) { }
+            : this(provider, url, hash, Environment.i.platform.webRequest)
+        {
+        }
 
         public AssetPromise_GLTF(ContentProvider provider, string url, IWebRequestController webRequestController)
-            : this(provider, url, null, webRequestController) { }
+            : this(provider, url, null, webRequestController)
+        {
+        }
 
         public AssetPromise_GLTF(ContentProvider provider, string url, string hash, IWebRequestController webRequestController)
         {
@@ -78,10 +85,13 @@ namespace DCL
                 initialVisibility = settings.visibleFlags != AssetPromiseSettings_Rendering.VisibleFlags.INVISIBLE,
                 shaderOverride = settings.shaderOverride,
                 addMaterialsToPersistentCaching = (settings.cachingFlags & MaterialCachingHelper.Mode.CACHE_MATERIALS) != 0,
+                forceGPUOnlyMesh = settings.forceGPUOnlyMesh
             };
 
             gltfComponent.LoadAsset(provider.baseUrl ?? assetDirectoryPath, fileName, GetId() as string,
                 false, tmpSettings, FileToHash);
+
+            gltfComponent.sceneImporter.OnWillUploadMeshToGPU += (x) => RenderingGlobalEvents.OnWillUploadMeshToGPU(x);
 
             this.OnSuccess = OnSuccess;
             this.OnFail = OnFail;

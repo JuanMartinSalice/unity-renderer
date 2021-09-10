@@ -106,12 +106,13 @@ namespace UnityGLTF
         /// </summary>
         public bool initialVisibility { get; set; }
 
+
         private static bool renderingIsDisabled => !CommonScriptableObjects.rendererState.Get();
         private static float budgetPerFrameInMillisecondsValue = 2f;
 
         public static float budgetPerFrameInMilliseconds { get => renderingIsDisabled ? float.MaxValue : budgetPerFrameInMillisecondsValue; set => budgetPerFrameInMillisecondsValue = value; }
 
-        public bool KeepCPUCopyOfMesh = true;
+        public bool forceGPUOnlyMesh = true;
 
         private bool useMaterialTransitionValue = true;
 
@@ -219,6 +220,7 @@ namespace UnityGLTF
         public GameObject lastLoadedScene { get { return _lastLoadedScene; } }
 
         public static System.Action<float> OnPerformanceFinish;
+        public event System.Action<Mesh> OnWillUploadMeshToGPU;
 
         /// <summary>
         /// Loads a glTF Scene into the LastLoadedScene field
@@ -346,7 +348,6 @@ namespace UnityGLTF
                             Object.DestroyImmediate(skeleton);
                     }
                 }
-
             }
             finally
             {
@@ -745,10 +746,12 @@ namespace UnityGLTF
             texture.LoadImage(buffer, markGpuOnly);
             texture = CheckAndReduceTextureSize(texture);
 
-#if !UNITY_EDITOR
-            //NOTE(Brian): This breaks importing in editor mode
-            texture.Compress(false);
-#endif
+            if ( Application.isPlaying )
+            {
+                //NOTE(Brian): This breaks importing in editor mode
+                texture.Compress(false);
+            }
+
             _assetCache.ImageCache[imageCacheIndex] = texture;
 
             if (ShouldYieldOnTimeout())
@@ -1003,7 +1006,7 @@ namespace UnityGLTF
                 string relativePath = RelativePathFrom(node.transform, root);
 
                 NumericArray input = samplerCache.Input.AccessorContent,
-                             output = samplerCache.Output.AccessorContent;
+                    output = samplerCache.Output.AccessorContent;
 
                 string[] propertyNames;
                 Vector3 coordinateSpaceConversionScale = new Vector3(-1, 1, 1);
@@ -2131,18 +2134,22 @@ namespace UnityGLTF
                 yield return YieldOnTimeout();
             }
 
+            mesh.Optimize();
+
 // Disable it in runtime so this optimization only takes place in
 // asset bundle converter time.
 #if UNITY_EDITOR
-            mesh.Optimize();
 
             if (ShouldYieldOnTimeout())
             {
                 yield return YieldOnTimeout();
             }
 #endif
-            if (!KeepCPUCopyOfMesh)
+
+
+            if (forceGPUOnlyMesh)
             {
+                OnWillUploadMeshToGPU?.Invoke(mesh);
                 mesh.UploadMeshData(true);
             }
 
@@ -2650,6 +2657,7 @@ namespace UnityGLTF
             {
                 return _loader.assetIdConverter(uri, out hash);
             }
+
             hash = uri;
             return false;
         }
