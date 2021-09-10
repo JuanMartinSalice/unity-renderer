@@ -22,6 +22,7 @@ public class BIWEntity
     public event Action<BIWEntity> OnErrorStatusChange;
 
     public bool isDeleted { get; private set; }
+
     public bool isLocked
     {
         get { return GetIsLockedValue(); }
@@ -642,6 +643,7 @@ public class BIWEntity
             t.ResetLocalTRS();
 
             var meshCollider = entityColliderChildren.AddComponent<MeshCollider>();
+            meshCollider.cookingOptions = MeshColliderCookingOptions.None;
 
             if (meshInfo.renderers[i] is SkinnedMeshRenderer)
             {
